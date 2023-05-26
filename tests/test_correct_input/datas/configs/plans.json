@@ -1,0 +1,36 @@
+{
+  "file_name": "Планы.xlsx",
+  "columns_config": {
+    "plan": {
+      "name": 0,
+      "description": 1,
+      "started_at": 2,
+      "due_date": 3
+    }
+  },
+  "expected_data": {
+    "plans": {
+      "size": 3,
+      "data": [
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00"
+        },
+        {
+          "name": "Мобильный релиз",
+          "description": "Мобильный релиз",
+          "started_at": "01.01.2023 14:20:20",
+          "due_date": "01.01.2023 15:00:00"
+        },
+        {
+          "name": "PS релиз",
+          "description": "",
+          "started_at": "01.01.2023 00:00:00",
+          "due_date": "02.01.2023 00:00:00"
+        }
+      ]
+    }
+  }
+}

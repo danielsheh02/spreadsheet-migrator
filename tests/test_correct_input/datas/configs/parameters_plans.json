@@ -1,0 +1,92 @@
+{
+  "file_name": "Параметры+планы.xlsx",
+  "columns_config": {
+    "parameter": {
+      "group_data": 0
+    },
+    "plan": {
+      "name": 1,
+      "description": 2,
+      "started_at": 3,
+      "due_date": 4
+    }
+  },
+  "expected_data": {
+    "parameters": {
+      "size": 6,
+      "data": [
+        {
+          "data": "LINUX",
+          "group_name": "OS"
+        },
+        {
+          "data": "WINDOWS",
+          "group_name": "OS"
+        },
+        {
+          "data": "CHROME",
+          "group_name": "BROWSER"
+        },
+        {
+          "data": "YANDEX",
+          "group_name": "BROWSER"
+        },
+        {
+          "data": "ANDROID",
+          "group_name": "MOBILE OS"
+        },
+        {
+          "data": "IOS",
+          "group_name": "MOBILE OS"
+        }
+      ]
+    },
+    "plans": {
+      "size": 6,
+      "data": [
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [LINUX, YANDEX]"
+        },
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [WINDOWS, YANDEX]"
+        },
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [LINUX, CHROME]"
+        },
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [WINDOWS, CHROME]"
+        },
+        {
+          "name": "Мобильный релиз",
+          "description": "",
+          "started_at": "01.01.2023 14:20:20",
+          "due_date": "01.01.2023 15:00:00",
+          "title": "Мобильный релиз [ANDROID]"
+        },
+        {
+          "name": "Мобильный релиз",
+          "description": "",
+          "started_at": "01.01.2023 14:20:20",
+          "due_date": "01.01.2023 15:00:00",
+          "title": "Мобильный релиз [IOS]"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,405 @@
+{
+  "file_name": "Сьюты+кейсы+параметры+планы = тесты.xlsx",
+  "columns_config": {
+    "suite": {
+      "name": 0,
+      "description": 1
+    },
+    "case": {
+      "name": 2,
+      "scenario": 3,
+      "description": 4,
+      "setup": 5,
+      "teardown": 6,
+      "estimate": 7
+    },
+    "parameter": {
+      "group_data": 8
+    },
+    "plan": {
+      "name": 9,
+      "description": 10,
+      "started_at": 11,
+      "due_date": 12
+    }
+  },
+  "expected_data": {
+    "suites": {
+      "size": 2,
+      "data": [
+        {
+          "name": "Авторизация",
+          "description": "Авторизация"
+        },
+        {
+          "name": "Создание",
+          "description": ""
+        }
+      ]
+    },
+    "cases": {
+      "size": 5,
+      "data": [
+        {
+          "name": "Вход",
+          "scenario": "Протестировать вход в систему",
+          "description": "Протестировать вход в систему",
+          "setup": "Открыть браузер",
+          "teardown": "Закрыть браузер",
+          "estimate": 100
+        },
+        {
+          "name": "Выход",
+          "scenario": "Протестировать выход из системы",
+          "description": "Протестировать выход из системы",
+          "setup": "Открыть браузер",
+          "teardown": "Закрыть браузер",
+          "estimate": 200
+        },
+        {
+          "name": "Создание сьюты",
+          "scenario": "Протестировать создание сьюты",
+          "description": "",
+          "setup": "",
+          "teardown": "",
+          "estimate": null
+        },
+        {
+          "name": "Создание кейса",
+          "scenario": "Протестировать создание кейса",
+          "description": "",
+          "setup": "",
+          "teardown": "",
+          "estimate": null
+        },
+        {
+          "name": "Создание проекта",
+          "scenario": "Протестировать создание проекта",
+          "description": "",
+          "setup": "",
+          "teardown": "",
+          "estimate": null
+        }
+      ]
+    },
+    "parameters": {
+      "size": 6,
+      "data": [
+        {
+          "data": "LINUX",
+          "group_name": "OS"
+        },
+        {
+          "data": "WINDOWS",
+          "group_name": "OS"
+        },
+        {
+          "data": "CHROME",
+          "group_name": "BROWSER"
+        },
+        {
+          "data": "YANDEX",
+          "group_name": "BROWSER"
+        },
+        {
+          "data": "ANDROID",
+          "group_name": "MOBILE OS"
+        },
+        {
+          "data": "IOS",
+          "group_name": "MOBILE OS"
+        }
+      ]
+    },
+    "plans": {
+      "size": 6,
+      "data": [
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [WINDOWS, CHROME]"
+        },
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [WINDOWS, YANDEX]"
+        },
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [LINUX, CHROME]"
+        },
+        {
+          "name": "Десктоп релиз",
+          "description": "Десктоп релиз",
+          "started_at": "01.01.2023 12:00:00",
+          "due_date": "01.01.2023 13:00:00",
+          "title": "Десктоп релиз [LINUX, YANDEX]"
+        },
+        {
+          "name": "Мобильный релиз",
+          "description": "",
+          "started_at": "01.01.2023 14:20:20",
+          "due_date": "01.01.2023 15:00:00",
+          "title": "Мобильный релиз [ANDROID]"
+        },
+        {
+          "name": "Мобильный релиз",
+          "description": "",
+          "started_at": "01.01.2023 14:20:20",
+          "due_date": "01.01.2023 15:00:00",
+          "title": "Мобильный релиз [IOS]"
+        }
+      ]
+    },
+    "tests": {
+      "size": 14,
+      "data": [
+        {
+          "case": {
+            "name": "Вход",
+            "scenario": "Протестировать вход в систему",
+            "description": "Протестировать вход в систему",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 100
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [WINDOWS, CHROME]"
+          }
+        },
+        {
+          "case": {
+            "name": "Выход",
+            "scenario": "Протестировать выход из системы",
+            "description": "Протестировать выход из системы",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 200
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [WINDOWS, CHROME]"
+          }
+        },
+        {
+          "case": {
+            "name": "Вход",
+            "scenario": "Протестировать вход в систему",
+            "description": "Протестировать вход в систему",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 100
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [WINDOWS, YANDEX]"
+          }
+        },
+        {
+          "case": {
+            "name": "Выход",
+            "scenario": "Протестировать выход из системы",
+            "description": "Протестировать выход из системы",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 200
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [WINDOWS, YANDEX]"
+          }
+        },
+        {
+          "case": {
+            "name": "Вход",
+            "scenario": "Протестировать вход в систему",
+            "description": "Протестировать вход в систему",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 100
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [LINUX, CHROME]"
+          }
+        },
+        {
+          "case": {
+            "name": "Выход",
+            "scenario": "Протестировать выход из системы",
+            "description": "Протестировать выход из системы",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 200
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [LINUX, CHROME]"
+          }
+        },
+        {
+          "case": {
+            "name": "Вход",
+            "scenario": "Протестировать вход в систему",
+            "description": "Протестировать вход в систему",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 100
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [LINUX, YANDEX]"
+          }
+        },
+        {
+          "case": {
+            "name": "Выход",
+            "scenario": "Протестировать выход из системы",
+            "description": "Протестировать выход из системы",
+            "setup": "Открыть браузер",
+            "teardown": "Закрыть браузер",
+            "estimate": 200
+          },
+          "plan": {
+            "name": "Десктоп релиз",
+            "description": "Десктоп релиз",
+            "started_at": "01.01.2023 12:00:00",
+            "due_date": "01.01.2023 13:00:00",
+            "title": "Десктоп релиз [LINUX, YANDEX]"
+          }
+        },
+        {
+          "case": {
+            "name": "Создание кейса",
+            "scenario": "Протестировать создание кейса",
+            "description": "",
+            "setup": "",
+            "teardown": "",
+            "estimate": null
+          },
+          "plan": {
+            "name": "Мобильный релиз",
+            "description": "",
+            "started_at": "01.01.2023 14:20:20",
+            "due_date": "01.01.2023 15:00:00",
+            "title": "Мобильный релиз [ANDROID]"
+          }
+        },
+        {
+          "case": {
+            "name": "Создание проекта",
+            "scenario": "Протестировать создание проекта",
+            "description": "",
+            "setup": "",
+            "teardown": "",
+            "estimate": null
+          },
+          "plan": {
+            "name": "Мобильный релиз",
+            "description": "",
+            "started_at": "01.01.2023 14:20:20",
+            "due_date": "01.01.2023 15:00:00",
+            "title": "Мобильный релиз [ANDROID]"
+          }
+        },
+        {
+          "case": {
+            "name": "Создание сьюты",
+            "scenario": "Протестировать создание сьюты",
+            "description": "",
+            "setup": "",
+            "teardown": "",
+            "estimate": null
+          },
+          "plan": {
+            "name": "Мобильный релиз",
+            "description": "",
+            "started_at": "01.01.2023 14:20:20",
+            "due_date": "01.01.2023 15:00:00",
+            "title": "Мобильный релиз [ANDROID]"
+          }
+        },
+        {
+          "case": {
+            "name": "Создание кейса",
+            "scenario": "Протестировать создание кейса",
+            "description": "",
+            "setup": "",
+            "teardown": "",
+            "estimate": null
+          },
+          "plan": {
+            "name": "Мобильный релиз",
+            "description": "",
+            "started_at": "01.01.2023 14:20:20",
+            "due_date": "01.01.2023 15:00:00",
+            "title": "Мобильный релиз [IOS]"
+          }
+        },
+        {
+          "case": {
+            "name": "Создание проекта",
+            "scenario": "Протестировать создание проекта",
+            "description": "",
+            "setup": "",
+            "teardown": "",
+            "estimate": null
+          },
+          "plan": {
+            "name": "Мобильный релиз",
+            "description": "",
+            "started_at": "01.01.2023 14:20:20",
+            "due_date": "01.01.2023 15:00:00",
+            "title": "Мобильный релиз [IOS]"
+          }
+        },
+        {
+          "case": {
+            "name": "Создание сьюты",
+            "scenario": "Протестировать создание сьюты",
+            "description": "",
+            "setup": "",
+            "teardown": "",
+            "estimate": null
+          },
+          "plan": {
+            "name": "Мобильный релиз",
+            "description": "",
+            "started_at": "01.01.2023 14:20:20",
+            "due_date": "01.01.2023 15:00:00",
+            "title": "Мобильный релиз [IOS]"
+          }
+        }
+      ]
+    }
+  }
+}

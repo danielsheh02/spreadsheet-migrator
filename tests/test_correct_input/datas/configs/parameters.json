@@ -1,0 +1,43 @@
+{
+  "file_name": "Параметры.xlsx",
+  "columns_config": {
+    "parameter": {
+      "group_data": 0
+    }
+  },
+  "expected_data": {
+    "parameters": {
+      "size": 7,
+      "data": [
+        {
+          "data": "LINUX",
+          "group_name": "OS"
+        },
+        {
+          "data": "WINDOWS",
+          "group_name": "OS"
+        },
+        {
+          "data": "CHROME",
+          "group_name": "BROWSER"
+        },
+        {
+          "data": "YANDEX",
+          "group_name": "BROWSER"
+        },
+        {
+          "data": "ANDROID",
+          "group_name": "MOBILE OS"
+        },
+        {
+          "data": "IOS",
+          "group_name": "MOBILE OS"
+        },
+        {
+          "data": "EDGE",
+          "group_name": "BROWSER"
+        }
+      ]
+    }
+  }
+}

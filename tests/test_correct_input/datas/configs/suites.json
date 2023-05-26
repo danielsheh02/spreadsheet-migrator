@@ -1,0 +1,40 @@
+{
+  "file_name": "Сьюты.xlsx",
+  "columns_config": {
+    "suite": {
+      "name": 0,
+      "description": 1
+    }
+  },
+  "expected_data": {
+    "suites": {
+      "size": 6,
+      "data": [
+        {
+          "name": "Сьюта 1",
+          "description": "Сьюта 1"
+        },
+        {
+          "name": "Сьюта 2",
+          "description": "Сьюта 2"
+        },
+        {
+          "name": "Сьюта 3",
+          "description": "Сьюта 3"
+        },
+        {
+          "name": "Сьюта 4",
+          "description": ""
+        },
+        {
+          "name": "Сьюта 5",
+          "description": ""
+        },
+        {
+          "name": "Сьюта 6",
+          "description": ""
+        }
+      ]
+    }
+  }
+}

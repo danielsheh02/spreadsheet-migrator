@@ -1,0 +1,101 @@
+{
+  "file_name": "Сьюты+кейсы.xlsx",
+  "columns_config": {
+    "suite": {
+      "name": 0,
+      "description": 1
+    },
+    "case": {
+      "name": 2,
+      "scenario": 3,
+      "description": 4,
+      "setup": 5,
+      "teardown": 6,
+      "estimate": 7
+    }
+  },
+  "expected_data": {
+    "suites": {
+      "size": 6,
+      "data": [
+        {
+          "name": "Сьюта 1",
+          "description": "Сьюта 1"
+        },
+        {
+          "name": "Сьюта 2",
+          "description": "Сьюта 2"
+        },
+        {
+          "name": "Сьюта 3",
+          "description": "Сьюта 3"
+        },
+        {
+          "name": "Сьюта 4",
+          "description": ""
+        },
+        {
+          "name": "Сьюта 5",
+          "description": ""
+        },
+        {
+          "name": "Сьюта 6",
+          "description": ""
+        }
+      ]
+    },
+    "cases": {
+      "size": 6,
+      "data": [
+        {
+          "name": "Кейс 1",
+          "scenario": "Кейс 1",
+          "description": "Кейс 1",
+          "setup": "Кейс 1",
+          "teardown": "Кейс 1",
+          "estimate": 100
+        },
+        {
+          "name": "Кейс 2",
+          "scenario": "Кейс 2",
+          "description": "Кейс 2",
+          "setup": "Кейс 2",
+          "teardown": "Кейс 2",
+          "estimate": 100
+        },
+        {
+          "name": "Кейс 3",
+          "scenario": "Кейс 3",
+          "description": "Кейс 3",
+          "setup": "Кейс 3",
+          "teardown": "Кейс 3",
+          "estimate": 100
+        },
+        {
+          "name": "Кейс 4",
+          "scenario": "Кейс 4",
+          "description": "",
+          "setup": "",
+          "teardown": "",
+          "estimate": null
+        },
+        {
+          "name": "Кейс 5",
+          "scenario": "Кейс 5",
+          "description": "",
+          "setup": "",
+          "teardown": "",
+          "estimate": null
+        },
+        {
+          "name": "Кейс 6",
+          "scenario": "Кейс 6",
+          "description": "",
+          "setup": "",
+          "teardown": "",
+          "estimate": null
+        }
+      ]
+    }
+  }
+}
