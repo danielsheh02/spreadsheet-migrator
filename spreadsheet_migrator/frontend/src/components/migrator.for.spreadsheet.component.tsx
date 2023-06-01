@@ -52,6 +52,23 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
         value: "",
         number: null
     })
+    const [lackColumnStepName, setColumnLackStepName] = useState(false)
+    const [columnStepName, setColumnStepName] = useState<{ value: string, number: number | null }>({
+        value: "",
+        number: null
+    })
+    const [lackColumnStepScenario, setColumnLackStepScenario] = useState(false)
+    const [columnStepScenario, setColumnStepScenario] = useState<{ value: string, number: number | null }>({
+        value: "",
+        number: null
+    })
+    const [lackColumnStepExpected, setColumnLackStepExpected] = useState(false)
+    const [columnStepExpected, setColumnStepExpected] = useState<{ value: string, number: number | null }>({
+        value: "",
+        number: null
+    })
+    const [countOfSelectedStepCol, setCountOfSelectedStepCol] = useState(0)
+
     const [lackColumnCaseName, setLackColumnCaseName] = useState(false)
     const [columnScenarioCase, setColumnScenarioCase] = useState<{ value: string, number: number | null }>({
         value: "",
@@ -120,6 +137,9 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
         CaseSetUp = "columnCaseSetUp",
         CaseTearDown = "columnTearDown",
         CaseEstimate = "columnEstimateTimeCase",
+        StepName = "columnStepName",
+        StepExpected = "columnStepExpected",
+        StepScenario = "columnStepScenario",
         Parameters = "columnParameters",
         PlanName = "columnNamePlan",
         PlanDescription = "columnDescriptionPlan",
@@ -133,6 +153,9 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
         TypeOfColumn.CaseEstimate]
     const planColumns = [TypeOfColumn.PlanName, TypeOfColumn.PlanDescription,
         TypeOfColumn.PlanStartedAt, TypeOfColumn.PlanDueDate]
+    const stepColumns = [TypeOfColumn.StepName, TypeOfColumn.StepScenario,
+        TypeOfColumn.StepExpected]
+
 
     const handleColumnResize = (ci: Id, width: number) => {
         setColumns((prevColumns) => {
@@ -213,6 +236,11 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
         setColumnDueDatePlan({value: "", number: null})
         setColumnDescriptionPlan({value: "", number: null})
         setCountOfSelectedPlanCol(0)
+
+        setColumnStepScenario({value: "", number: null})
+        setColumnStepExpected({value: "", number: null})
+        setColumnStepName({value: "", number: null})
+        setCountOfSelectedStepCol(0)
     }
 
     const handleClose = () => {
@@ -245,6 +273,13 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                 // setLackColumnDueDatePlan(false)
             }
             setCountOfSelectedPlanCol(prevState => prevState - 1)
+        } else if (stepColumns.includes(columnName)) {
+            if (countOfSelectedStepCol - 1 === 0) {
+                setColumnLackStepName(false)
+                setColumnLackStepScenario(false)
+                setColumnLackStepExpected(false)
+            }
+            setCountOfSelectedStepCol(prevState => prevState - 1)
         }
     }
 
@@ -268,9 +303,16 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                 returnedValue = false
                 setLackColumnCaseName(true)
             }
-            if (columnScenarioCase.number === null) {
+            if (columnScenarioCase.number === null && countOfSelectedStepCol === 0) {
                 returnedValue = false
                 setLackColumnScenarioCase(true)
+            }
+        }
+        if (columnStepName.number !== null || columnStepExpected.number !== null
+            || columnStepScenario.number !== null) {
+            if (columnStepScenario.number === null) {
+                returnedValue = false
+                setColumnLackStepScenario(true)
             }
         }
         if (columnNamePlan.number !== null
@@ -317,6 +359,24 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                 }
             }
         }
+
+        if (countOfSelectedStepCol !== 0) {
+            const stepFieldsColumns: [string, number | null][] = [
+                ["name", columnStepName.number],
+                ["scenario", columnStepScenario.number],
+                ["expected", columnStepExpected.number]
+            ]
+            for (const fieldColumn of stepFieldsColumns) {
+                const num = getColumnNum(fieldColumn[1])
+                if (num !== null) {
+                    if (config["step"] === undefined) {
+                        config["step"] = {}
+                    }
+                    config["step"][fieldColumn[0]] = num
+                }
+            }
+        }
+
 
         if (countOfSelectedCaseCol !== 0) {
             const caseFieldsColumns: [string, number | null][] = [
@@ -511,17 +571,26 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                     case TypeOfColumn.PlanStartedAt: {
                         setColumn(valueOfCell.text, Number(e.columnId), setColumnStartedAtPlan)
                         setCountOfSelectedPlanCol(prev => prev + 1)
-                        // if (lackColumnStartedAtPlan) {
-                        //     setLackColumnStartedAtPlan(false)
-                        // }
                         break
                     }
                     case TypeOfColumn.PlanDueDate: {
                         setColumn(valueOfCell.text, Number(e.columnId), setColumnDueDatePlan)
                         setCountOfSelectedPlanCol(prev => prev + 1)
-                        // if (lackColumnDueDatePlan) {
-                        //     setLackColumnDueDatePlan(false)
-                        // }
+                        break
+                    }
+                    case TypeOfColumn.StepName: {
+                        setColumn(valueOfCell.text, Number(e.columnId), setColumnStepName)
+                        setCountOfSelectedStepCol(prev => prev + 1)
+                        break
+                    }
+                    case TypeOfColumn.StepScenario: {
+                        setColumn(valueOfCell.text, Number(e.columnId), setColumnStepScenario)
+                        setCountOfSelectedStepCol(prev => prev + 1)
+                        break
+                    }
+                    case TypeOfColumn.StepExpected: {
+                        setColumn(valueOfCell.text, Number(e.columnId), setColumnStepExpected)
+                        setCountOfSelectedStepCol(prev => prev + 1)
                         break
                     }
                 }
@@ -628,7 +697,7 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                             </Grid>
                             <Grid className={classes.divForFieldColumn}>
                                 <Typography fontWeight={600} fontSize={14}>
-                                    Сценарий *
+                                    Сценарий (* Если нет шагов)
                                 </Typography>
                                 {getTextField(TypeOfColumn.CaseScenario, setColumnScenarioCase, columnScenarioCase, lackColumnScenarioCase)}
                             </Grid>
@@ -659,6 +728,30 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                                     Время выполнения
                                 </Typography>
                                 {getTextField(TypeOfColumn.CaseEstimate, setColumnEstimateTimeCase, columnEstimateTimeCase, false)}
+                            </Grid>
+                        </Grid>
+                        <hr className={classes.delimGenerationFromTable}/>
+                        <Typography fontWeight={600} fontSize={18} sx={{marginLeft: "10px"}}>
+                            Шаги тест кейсов
+                        </Typography>
+                        <Grid sx={{display: "flex"}}>
+                            <Grid className={classes.divForFieldColumn}>
+                                <Typography fontWeight={600} fontSize={14}>
+                                    Step name
+                                </Typography>
+                                {getTextField(TypeOfColumn.StepName, setColumnStepName, columnStepName, lackColumnStepName)}
+                            </Grid>
+                            <Grid className={classes.divForFieldColumn}>
+                                <Typography fontWeight={600} fontSize={14}>
+                                    Scenario *
+                                </Typography>
+                                {getTextField(TypeOfColumn.StepScenario, setColumnStepScenario, columnStepScenario, lackColumnStepScenario)}
+                            </Grid>
+                            <Grid className={classes.divForFieldColumn}>
+                                <Typography fontWeight={600} fontSize={14}>
+                                    Expected
+                                </Typography>
+                                {getTextField(TypeOfColumn.StepExpected, setColumnStepExpected, columnStepExpected, false)}
                             </Grid>
                         </Grid>
                         <hr className={classes.delimGenerationFromTable}/>
