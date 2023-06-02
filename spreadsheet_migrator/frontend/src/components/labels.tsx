@@ -20,19 +20,6 @@ const MenuProps = {
   },
 };
 
-const labelsList = [
-  '123',
-  'case_1',
-  'case_2',
-  'unknown',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
-
 interface LabelsProps {
   columnLabels: { value: string, number: number }[]
   setColumnLabels: React.Dispatch<React.SetStateAction<{ value: string, number: number }[]>>
@@ -40,17 +27,7 @@ interface LabelsProps {
 }
 
 export default function Labels({ columnLabels, setColumnLabels, setFocusOnElement }: LabelsProps) {
-  const [personName, setPersonName] = React.useState<string[]>([])
   const [isFocued, setIsFocused] = React.useState(false)
-
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
 
   const handleAddClick = () => {
     setFocusOnElement("columnLabels")
