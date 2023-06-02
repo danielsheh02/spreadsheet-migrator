@@ -19,6 +19,7 @@ import project from "./models.interfaces"
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from "@mui/material/Box";
 import {Row as RowReadExcelFile} from 'read-excel-file'
+import Labels from "./labels";
 
 interface Props {
     show: boolean;
@@ -116,6 +117,8 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
     })
     const [countOfSelectedPlanCol, setCountOfSelectedPlanCol] = useState(0)
 
+    const [columnLabels, setColumnLabels] = useState<{ value: string, number: number }[]>([])
+
     const [rows, setRows] = useState<Row []>([])
     const [columns, setColumns] = useState<Column[]>([])
     const [showTable, setShowTable] = useState(false)
@@ -145,6 +148,7 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
         PlanDescription = "columnDescriptionPlan",
         PlanStartedAt = "columnStartedAtPlan",
         PlanDueDate = "columnDueDatePlan",
+        Labels = "columnLabels",
     }
 
     const suiteColumns = [TypeOfColumn.SuiteName, TypeOfColumn.SuiteDescription]
@@ -344,7 +348,7 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
     }
 
     const generateConfig = () => {
-        let config: Record<string, Record<string, number>> = {}
+        let config: Record<string, Record<string, number | number[]>> = {}
         if (countOfSelectedSuiteCol !== 0) {
             const suiteFieldsColumns: [string, number | null][] = [
                 ["name", columnSuiteName.number], ["description", columnSuiteDescription.number]
@@ -415,6 +419,12 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                 }
             }
         }
+
+        if (columnLabels.length) {
+            const labelsCols = columnLabels.map((col) => col.number)
+            config["case"] = { ...config["case"], labels: labelsCols }
+        }
+
         return config
     }
 
@@ -489,7 +499,7 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
             />)
     }
 
-    function setColumn(value: string, number: number, setColumn: (value: { value: string, number: number }) => void) {
+    function setColumnHandler(value: string, number: number, setColumn: (value: { value: string, number: number }) => void) {
         setColumn({
             value: value,
             number: number
@@ -503,7 +513,7 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
             if ("text" in valueOfCell) {
                 switch (focusOnElement) {
                     case TypeOfColumn.SuiteName: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnSuiteName)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnSuiteName)
                         setCountOfSelectedSuiteCol(prevState => prevState + 1)
                         if (lackColumnSuiteName) {
                             setLackColumnSuiteName(false)
@@ -511,12 +521,12 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                         break
                     }
                     case TypeOfColumn.SuiteDescription: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnSuiteDescription)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnSuiteDescription)
                         setCountOfSelectedSuiteCol(prevState => prevState + 1)
                         break
                     }
                     case TypeOfColumn.CaseName: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnCaseName)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnCaseName)
                         setCountOfSelectedCaseCol(prev => prev + 1)
                         if (lackColumnCaseName) {
                             setLackColumnCaseName(false)
@@ -524,12 +534,12 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                         break
                     }
                     case TypeOfColumn.CaseDescription: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnDescriptionCase)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnDescriptionCase)
                         setCountOfSelectedCaseCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.CaseScenario: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnScenarioCase)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnScenarioCase)
                         setCountOfSelectedCaseCol(prev => prev + 1)
                         if (lackColumnScenarioCase) {
                             setLackColumnScenarioCase(false)
@@ -537,26 +547,26 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                         break
                     }
                     case TypeOfColumn.CaseSetUp: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnSetUp)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnSetUp)
                         setCountOfSelectedCaseCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.CaseTearDown: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnTearDown)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnTearDown)
                         setCountOfSelectedCaseCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.CaseEstimate: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnEstimateTimeCase)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnEstimateTimeCase)
                         setCountOfSelectedCaseCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.Parameters: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnParameters)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnParameters)
                         break
                     }
                     case TypeOfColumn.PlanName: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnNamePlan)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnNamePlan)
                         setCountOfSelectedPlanCol(prev => prev + 1)
                         if (lackColumnNamePlan) {
                             setLackColumnNamePlan(false)
@@ -564,32 +574,41 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                         break
                     }
                     case TypeOfColumn.PlanDescription: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnDescriptionPlan)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnDescriptionPlan)
                         setCountOfSelectedPlanCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.PlanStartedAt: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnStartedAtPlan)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnStartedAtPlan)
                         setCountOfSelectedPlanCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.PlanDueDate: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnDueDatePlan)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnDueDatePlan)
                         setCountOfSelectedPlanCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.StepName: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnStepName)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnStepName)
                         setCountOfSelectedStepCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.StepScenario: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnStepScenario)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnStepScenario)
                         setCountOfSelectedStepCol(prev => prev + 1)
                         break
                     }
                     case TypeOfColumn.StepExpected: {
-                        setColumn(valueOfCell.text, Number(e.columnId), setColumnStepExpected)
+                        setColumnHandler(valueOfCell.text, Number(e.columnId), setColumnStepExpected)
+                        setCountOfSelectedStepCol(prev => prev + 1)
+                        break
+                    }
+                    case TypeOfColumn.Labels: {
+                        const value = {
+                            value: valueOfCell.text,
+                            number: Number(e.columnId),
+                        }
+                        setColumnLabels((prevState) => ([...prevState, value]))
                         setCountOfSelectedStepCol(prev => prev + 1)
                         break
                     }
@@ -794,6 +813,11 @@ const MigratorForSpreadSheet: React.FC<Props> = ({
                             {getTextField(TypeOfColumn.Parameters, setColumnParameters, columnParameters, false)}
                         </Grid>
                         <hr className={classes.delimGenerationFromTable}/>
+                        <Labels
+                            columnLabels={columnLabels}
+                            setColumnLabels={setColumnLabels}
+                            setFocusOnElement={setFocusOnElement}
+                        />
                     </Grid>
                     <Grid style={{textAlign: "center"}}>
                         <Grid>
