@@ -199,9 +199,29 @@ class Parser:
                 case[column_name] = value
         return case
 
+    def get_labels(self):
+        numeration_to_labels = {}
+        numeration = None
+        for row_number in range(2, self.excel_data_ws.max_row + 1):
+            for column in self.config.get('case', {}).get('labels'):
+                label_name = self.get_cell_value(row_number, column)
+                if not label_name:
+                    continue
+                if new_numeration := self.get_cell_value(row_number, 0):
+                    numeration = new_numeration
+                if numeration not in numeration_to_labels:
+                    numeration_to_labels[numeration] = []
+                numeration_to_labels[numeration].append(
+                    {
+                        'name': label_name,
+                    }
+                )
+        return numeration_to_labels
+
     def get_cases_with_steps(self):
         suite_name_to_cases = {}
         steps = self.get_steps()
+        labels = self.get_labels()
         for row_number in range(2, self.excel_data_ws.max_row + 1):
             numeration = self.get_cell_value(row_number, 0)
             suite_name = self.get_cell_value(row_number, self.config.get('suite', {}).get('name'))
@@ -211,6 +231,7 @@ class Parser:
                 suite_name_to_cases[suite_name] = []
             case = self.get_case_steps_preset(row_number, self.config.get('case'))
             case['steps'] = steps[numeration]
+            case['labels'] = labels.get(numeration, [])
             suite_name_to_cases[suite_name].append(case)
         return suite_name_to_cases
 
@@ -266,6 +287,7 @@ class Parser:
     def get_or_create_suites_and_cases(self):
         suite_name_to_suites = self.get_suites()
         suite_name_to_cases = self.get_cases_with_steps()
+
         for suite_name, suite_dict in suite_name_to_suites.items():
             suite = self.testy_creator.get_or_create_suite(suite_dict)
             for case_dict in suite_name_to_cases[suite_name]:

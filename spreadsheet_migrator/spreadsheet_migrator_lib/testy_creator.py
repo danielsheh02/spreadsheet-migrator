@@ -3,6 +3,8 @@ from typing import Dict, List, Tuple, Set
 from django.core.exceptions import MultipleObjectsReturned
 from django.db.models import Q
 from django.forms.models import model_to_dict
+
+from core.services.labels import LabelService
 from tests_description.models import TestCase, TestSuite, TestCaseStep
 from tests_description.services.cases import TestCaseService
 from tests_representation.api.v1.serializers import TestPlanInputSerializer, TestPlanOutputSerializer
@@ -88,6 +90,7 @@ class TestyCreator:
 
     def get_or_create_case(self, case_dict):
         steps = case_dict.pop('steps', [])
+        labels = case_dict.pop('labels')
         q_lookup = Q()
         for step in steps:
             q_lookup |= Q(**step)
@@ -106,6 +109,10 @@ class TestyCreator:
             step['test_case_history_id'] = found_case.history.first().history_id
             step['sort_order'] = idx
             TestCaseService().step_create(step)
+        if labels:
+            label_kwargs = {'user': self.request.user}
+            labeled_item_kwargs = {'content_object_history_id': found_case.history.first().history_id}
+            LabelService().add(labels, found_case, label_kwargs, labeled_item_kwargs)
         return found_case
 
     @staticmethod
