@@ -32,6 +32,9 @@ class Service:
     def get_reports(request):
         file_name = request.query_params.get("file_name", "")
         uuid = request.query_params.get("uuid", "")
+        path = tempfile.gettempdir() + os.sep + 'testy_spreadsheet_reports'
+        if not os.path.exists(path):
+            os.mkdir(path)
         if file_name:
             if os.path.exists(
                     tempfile.gettempdir() + os.sep + Service.__dir_reports + os.sep + request.query_params[
@@ -113,7 +116,7 @@ class Service:
         )
         parser = Parser(request.data, testy_creator, json.loads(request.data["config"]))
         Service.delete_empty_rows(parser)
-        if parser.config.get('suite') and parser.config.get('step'):
+        if parser.config.get('suite') and (parser.config.get('step') or parser.config.get('case', {}).get('labels')):
             parser.validate_numeration()
             parser.get_or_create_suites_and_cases()
         elif parser.config.get("suite") is not None and parser.config.get("suite").get("name") is not None:

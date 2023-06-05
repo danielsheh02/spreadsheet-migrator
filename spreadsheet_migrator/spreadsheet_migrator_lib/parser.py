@@ -186,14 +186,19 @@ class Parser:
                 self.testy_creator.create_datas_without_suite([(parameters, plan)], self.project)
         return suite_case_parameters_plan
 
-    def get_case_steps_preset(self, row_number, config_case):
+    def get_case_preset(self, row_number, config_case, is_steps: bool):
         case = {
             'name': self.get_cell_value(row_number, config_case.get('name')),
             'project_id': self.project.id,
-            'is_steps': True,
-            'scenario': ''
+            'is_steps': is_steps,
+            'scenario': '' if is_steps else self.get_cell_value(row_number, config_case.get('scenario'))
         }
         column_names = ['description', 'setup', 'teardown', 'estimate']
+        if not is_steps and not case['scenario']:
+            self.testy_creator.put_to_log(
+                self.testy_creator.cases_logs,
+                lack_data={'row': row_number, 'columns': ['scenario']}
+            )
         for column_name in column_names:
             if value := self.get_cell_value(row_number, config_case.get(column_name)):
                 case[column_name] = value
@@ -203,7 +208,7 @@ class Parser:
         numeration_to_labels = {}
         numeration = None
         for row_number in range(2, self.excel_data_ws.max_row + 1):
-            for column in self.config.get('case', {}).get('labels'):
+            for column in self.config.get('case', {}).get('labels', []):
                 label_name = self.get_cell_value(row_number, column)
                 if not label_name:
                     continue
@@ -213,7 +218,7 @@ class Parser:
                     numeration_to_labels[numeration] = []
                 numeration_to_labels[numeration].append(
                     {
-                        'name': label_name,
+                        'name': str(label_name),
                     }
                 )
         return numeration_to_labels
@@ -229,8 +234,10 @@ class Parser:
                 continue
             if suite_name not in suite_name_to_cases:
                 suite_name_to_cases[suite_name] = []
-            case = self.get_case_steps_preset(row_number, self.config.get('case'))
-            case['steps'] = steps[numeration]
+            case = self.get_case_preset(row_number, self.config.get('case'), bool(steps.get(numeration)))
+            if not case:
+                continue
+            case['steps'] = steps.get(numeration, [])
             case['labels'] = labels.get(numeration, [])
             suite_name_to_cases[suite_name].append(case)
         return suite_name_to_cases
@@ -289,10 +296,10 @@ class Parser:
         suite_name_to_cases = self.get_cases_with_steps()
 
         for suite_name, suite_dict in suite_name_to_suites.items():
-            suite = self.testy_creator.get_or_create_suite(suite_dict)
+            suite = self.testy_creator.get_or_create_suite(suite_dict, self.project)
             for case_dict in suite_name_to_cases[suite_name]:
                 case_dict['suite_id'] = suite.id
-                self.testy_creator.get_or_create_case(case_dict)
+                self.testy_creator.get_or_create_case(case_dict, self.project)
 
     def validate_numeration(self):
         if not any(self.get_cell_value(row, 0) for row in range(2, self.excel_data_ws.max_row + 1)):
