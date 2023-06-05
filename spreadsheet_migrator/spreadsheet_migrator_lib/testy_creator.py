@@ -1,18 +1,25 @@
 from typing import Dict, List, Tuple, Set
 
+from django.core.exceptions import MultipleObjectsReturned
+from django.db.models import Q
 from django.forms.models import model_to_dict
-from tests_description.models import TestCase, TestSuite
+
+from core.models import Project
+from core.services.labels import LabelService
+from tests_description.models import TestCase, TestSuite, TestCaseStep
+from tests_description.services.cases import TestCaseService
 from tests_representation.api.v1.serializers import TestPlanInputSerializer, TestPlanOutputSerializer
 from tests_representation.models import Parameter, TestPlan, Test
 from tests_representation.services.testplans import TestPlanService
 
 
 class TestyCreator:
-    def __init__(self, suites_logs, cases_logs, parameters_logs, plans_logs, request):
+    def __init__(self, suites_logs, cases_logs, parameters_logs, plans_logs, step_logs, request):
         self.suites_logs = suites_logs
         self.cases_logs = cases_logs
         self.parameters_logs = parameters_logs
         self.plans_logs = plans_logs
+        self.step_logs = step_logs
         self.request = request
 
     def create_suites_cases_parameters(self, suite_case_parameters_plan: Dict[
@@ -72,6 +79,60 @@ class TestyCreator:
                     {(plan.get("name"), plan.get("description", ""), plan.get("started_at"), plan.get("due_date")): (
                         set(), set_of_ids_params)},
                     project)
+
+    def get_or_create_suite(self, suite_dict, project: Project):
+        created = False
+        try:
+            found_suite, created = TestSuite.objects.get_or_create(**suite_dict, project=project)
+        except MultipleObjectsReturned:
+            found_suite = TestSuite.objects.filter(**suite_dict, project=project)[0]
+        self.put_to_log(self.suites_logs, found_suite, created)
+        return found_suite
+
+    def get_or_create_case(self, case_dict, project: Project):
+        steps = case_dict.pop('steps')
+        labels = case_dict.pop('labels')
+        found_steps = self.find_steps(steps)
+        created = False
+        try:
+            found_case, created = TestCase.objects.get_or_create(**case_dict, steps__in=found_steps, project=project)
+        except MultipleObjectsReturned:
+            found_case = TestCase.objects.filter(**case_dict, steps__in=found_steps, project=project)[0]
+        self.put_to_log(self.cases_logs, found_case, created)
+        if not created:
+            return found_case
+        for idx, step in enumerate(steps, start=1):
+            step['test_case'] = found_case
+            step['project'] = found_case.project
+            step['test_case_history_id'] = found_case.history.first().history_id
+            step['sort_order'] = idx
+            TestCaseService().step_create(step)
+        if labels:
+            label_kwargs = {'user': self.request.user}
+            labeled_item_kwargs = {'content_object_history_id': found_case.history.first().history_id}
+            LabelService().add(labels, found_case, label_kwargs, labeled_item_kwargs)
+        return found_case
+
+    @staticmethod
+    def find_steps(steps):
+        q_lookup = Q()
+        for step in steps:
+            q_lookup |= Q(**step)
+        if not q_lookup:
+            return list()
+        return TestCaseStep.objects.filter(q_lookup)
+
+    @staticmethod
+    def put_to_log(log, model_instance=None, created: bool = False, lack_data=None):
+        if lack_data:
+            log.lack_data.append(lack_data)
+            return
+        if log.created.get(model_instance.id) or log.found.get(model_instance.id):
+            return
+        if created:
+            log.created[model_instance.id] = model_to_dict(model_instance)
+            return
+        log.found[model_instance.id] = model_to_dict(model_instance)
 
     def create_case(self, case, project, suite):
         """

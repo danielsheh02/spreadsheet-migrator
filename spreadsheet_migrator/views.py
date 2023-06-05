@@ -27,7 +27,7 @@ class SpreadsheetMigrator(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
         except TestyException as e:
             return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError as e:
+        except (ValueError, AssertionError) as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         except TestSuite.MultipleObjectsReturned:
             return Response("Suites with the same name were found in the same project, this should not be the case.",

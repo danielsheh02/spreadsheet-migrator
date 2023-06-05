@@ -39,6 +39,8 @@ class Parser:
         """
         The function get value in cell.
         """
+        if column is None or row is None:
+            return None
         return self.excel_data_ws[row][column].value
 
     def get_case(self, i, config_case: Dict[str, int]):
@@ -183,6 +185,125 @@ class Parser:
                 self.testy_creator.suites_logs.lack_data.append({"row": i, "columns": ["name"]})
                 self.testy_creator.create_datas_without_suite([(parameters, plan)], self.project)
         return suite_case_parameters_plan
+
+    def get_case_preset(self, row_number, config_case, is_steps: bool):
+        case = {
+            'name': self.get_cell_value(row_number, config_case.get('name')),
+            'project_id': self.project.id,
+            'is_steps': is_steps,
+            'scenario': '' if is_steps else self.get_cell_value(row_number, config_case.get('scenario'))
+        }
+        column_names = ['description', 'setup', 'teardown', 'estimate']
+        if not is_steps and not case['scenario']:
+            self.testy_creator.put_to_log(
+                self.testy_creator.cases_logs,
+                lack_data={'row': row_number, 'columns': ['scenario']}
+            )
+        for column_name in column_names:
+            if value := self.get_cell_value(row_number, config_case.get(column_name)):
+                case[column_name] = value
+        return case
+
+    def get_labels(self):
+        numeration_to_labels = {}
+        numeration = None
+        for row_number in range(2, self.excel_data_ws.max_row + 1):
+            for column in self.config.get('case', {}).get('labels', []):
+                label_name = self.get_cell_value(row_number, column)
+                if not label_name:
+                    continue
+                if new_numeration := self.get_cell_value(row_number, 0):
+                    numeration = new_numeration
+                if numeration not in numeration_to_labels:
+                    numeration_to_labels[numeration] = []
+                numeration_to_labels[numeration].append(
+                    {
+                        'name': str(label_name),
+                    }
+                )
+        return numeration_to_labels
+
+    def get_cases_with_steps(self):
+        suite_name_to_cases = {}
+        steps = self.get_steps()
+        labels = self.get_labels()
+        for row_number in range(2, self.excel_data_ws.max_row + 1):
+            numeration = self.get_cell_value(row_number, 0)
+            suite_name = self.get_cell_value(row_number, self.config.get('suite', {}).get('name'))
+            if not suite_name:
+                continue
+            if suite_name not in suite_name_to_cases:
+                suite_name_to_cases[suite_name] = []
+            case = self.get_case_preset(row_number, self.config.get('case'), bool(steps.get(numeration)))
+            if not case:
+                continue
+            case['steps'] = steps.get(numeration, [])
+            case['labels'] = labels.get(numeration, [])
+            suite_name_to_cases[suite_name].append(case)
+        return suite_name_to_cases
+
+    def get_steps(self):
+        numeration_to_steps = {}
+        numeration = None
+        for row_number in range(2, self.excel_data_ws.max_row + 1):
+            step_name = self.get_cell_value(row_number, self.config.get('step', {}).get('name'))
+            step_scenario = self.get_cell_value(row_number, self.config.get('step', {}).get('scenario'))
+            step_expected = self.get_cell_value(row_number, self.config.get('step', {}).get('expected'))
+            if new_numeration := self.get_cell_value(row_number, 0):
+                numeration = new_numeration
+            if not step_scenario:
+                self.testy_creator.put_to_log(
+                    self.testy_creator.step_logs,
+                    lack_data={'row': row_number, 'columns': ['scenario']}
+                )
+                continue
+            step_name = step_name if step_name else step_scenario.split('\n')[0]
+            if numeration not in numeration_to_steps:
+                numeration_to_steps[numeration] = []
+            numeration_to_steps[numeration].append(
+                {
+                    'name': step_name,
+                    'scenario': step_scenario,
+                    'expected': step_expected if step_expected else ''
+                }
+            )
+        return numeration_to_steps
+
+    def get_suites(self):
+        suite_name_to_suites = {}
+        config_suite = self.config.get('suite')
+        if not config_suite:
+            return {}
+        for row_number in range(2, self.excel_data_ws.max_row + 1):
+            numeration = self.get_cell_value(row_number, 0)
+            suite_name = self.get_cell_value(row_number, config_suite.get('name'))
+            if not suite_name:
+                if numeration:
+                    self.testy_creator.put_to_log(
+                        self.testy_creator.suites_logs,
+                        lack_data={'row': row_number, 'columns': ['name']}
+                    )
+                continue
+            suite = {'project_id': self.project.id}
+            for field_name, column_number in config_suite.items():
+                if value := self.get_cell_value(row_number, column_number):
+                    suite[field_name] = value
+            suite_name_to_suites[suite_name] = suite
+        return suite_name_to_suites
+
+    def get_or_create_suites_and_cases(self):
+        suite_name_to_suites = self.get_suites()
+        suite_name_to_cases = self.get_cases_with_steps()
+
+        for suite_name, suite_dict in suite_name_to_suites.items():
+            suite = self.testy_creator.get_or_create_suite(suite_dict, self.project)
+            for case_dict in suite_name_to_cases[suite_name]:
+                case_dict['suite_id'] = suite.id
+                self.testy_creator.get_or_create_case(case_dict, self.project)
+
+    def validate_numeration(self):
+        if not any(self.get_cell_value(row, 0) for row in range(2, self.excel_data_ws.max_row + 1)):
+            raise AssertionError('Numeration was not provided in "A" column')
 
     @staticmethod
     def union_cases_by_equal_parameters(
