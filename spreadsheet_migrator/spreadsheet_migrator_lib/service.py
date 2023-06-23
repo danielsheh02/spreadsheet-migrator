@@ -1,4 +1,4 @@
-import pathlib
+from pathlib import Path
 from typing import Dict, List, Tuple, Set
 import pytz
 from django.db import transaction
@@ -27,30 +27,22 @@ dict_idcase_plan_idparameters_alias = Dict[int, Dict[Tuple[str, str, str, str], 
 
 
 class Service:
-    __dir_reports = "testy_spreadsheet_reports"
+    reports_dir = Path(tempfile.gettempdir()) / "testy_spreadsheet_reports"
 
-    @staticmethod
-    def get_reports(request):
+    def get_reports(self, request):
         file_name = request.query_params.get("file_name", "")
         uuid = request.query_params.get("uuid", "")
-        path = tempfile.gettempdir() + os.sep + 'testy_spreadsheet_reports'
-        if not os.path.exists(path):
-            pathlib.Path(path).mkdir(parents=True, exist_ok=True)
         if file_name:
-            if os.path.exists(
-                    tempfile.gettempdir() + os.sep + Service.__dir_reports + os.sep + request.query_params[
-                        "file_name"]):
-                return FileResponse(
-                    open(
-                        tempfile.gettempdir() + os.sep + Service.__dir_reports + os.sep + request.query_params[
-                            "file_name"],
-                        "rb"),
-                    status=status.HTTP_200_OK)
-            else:
+            path = self.reports_dir / file_name
+            if not os.path.exists(path):
                 return Response("File does not exist", status=status.HTTP_404_NOT_FOUND)
+            return FileResponse(
+                open(path, 'rb'),
+                status=status.HTTP_200_OK
+            )
         elif uuid:
-            file_paths = glob.glob(
-                tempfile.gettempdir() + os.sep + Service.__dir_reports + os.sep + f"{uuid}_*_testy_logs.json")
+            path = self.reports_dir / f"{uuid}_*_testy_logs.json"
+            file_paths = glob.glob(str(path))
             reports_metadata: List[Dict] = []
             for file_path in file_paths:
                 with open(file_path, "rb") as file:
@@ -71,8 +63,7 @@ class Service:
                 report[key_info] = type_info
         return report
 
-    @staticmethod
-    def create_report_file(uuid, parser: Parser, testy_creator: TestyCreator):
+    def create_report_file(self, uuid, parser: Parser, testy_creator: TestyCreator):
         report = {"project": model_to_dict(parser.project), "report_name": parser.request_data["file"].name,
                   "creation_time": datetime.now(pytz.UTC).isoformat().replace("+00:00", "Z")}
         for key, obj_logs, config in [
@@ -86,10 +77,7 @@ class Service:
                 report_info = Service.fill_report(obj_logs, config)
                 if report_info:
                     report[key] = report_info
-        dir = pathlib.Path(tempfile.gettempdir() + os.sep + Service.__dir_reports)
-        dir.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile(prefix=uuid + "_", suffix="_testy_logs.json", delete=False, mode="w",
-                                         dir=dir) as file:
+        with tempfile.NamedTemporaryFile(prefix=uuid + "_", suffix="_testy_logs.json", delete=False, mode="w", dir=self.reports_dir) as file:
             json.dump(report, file, cls=DjangoJSONEncoder)
         return os.path.basename(file.name)
 
@@ -106,9 +94,9 @@ class Service:
             else:
                 parser.excel_data_ws.delete_rows(idx=i)
 
-    @staticmethod
     @transaction.atomic
-    def start_process(request) -> str:
+    def start_process(self, request) -> str:
+        self.reports_dir.mkdir(parents=True, exist_ok=True)
         testy_creator = TestyCreator(
             SuitesLogs(),
             CasesLogs(),
@@ -133,4 +121,4 @@ class Service:
         else:
             parameters_plan: List[Tuple[List[Dict], Dict]] = parser.parse_datas_without_suites()
             testy_creator.create_datas_without_suite(parameters_plan, parser.project)
-        return Service.create_report_file(parser.uuid, parser, testy_creator)
+        return Service().create_report_file(parser.uuid, parser, testy_creator)

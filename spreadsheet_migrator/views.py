@@ -14,13 +14,13 @@ from tests_representation.models import Parameter
 class SpreadsheetMigrator(APIView):
 
     def get(self, request):
-        return Service.get_reports(request)
+        return Service().get_reports(request)
 
     def post(self, request):
         try:
             format_file = os.path.splitext(request.data["file"].name)[1]
             if format_file == ".xlsx":
-                report_file_name: str = Service.start_process(request)
+                report_file_name: str = Service().start_process(request)
                 return Response(report_file_name, status=status.HTTP_200_OK)
             else:
                 return Response(f"This file format {format_file} does not support.",
