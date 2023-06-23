@@ -77,7 +77,7 @@ class Service:
                 report_info = Service.fill_report(obj_logs, config)
                 if report_info:
                     report[key] = report_info
-        with tempfile.NamedTemporaryFile(prefix=uuid + "_", suffix="_testy_logs.json", delete=False, mode="w", dir=self.reports_dir) as file:
+        with open(self.reports_dir / f"{uuid}__testy_logs.json", "w+") as file:
             json.dump(report, file, cls=DjangoJSONEncoder)
         return os.path.basename(file.name)
 
