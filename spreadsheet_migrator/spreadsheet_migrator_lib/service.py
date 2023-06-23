@@ -1,3 +1,4 @@
+import pathlib
 from typing import Dict, List, Tuple, Set
 import pytz
 from django.db import transaction
@@ -34,7 +35,7 @@ class Service:
         uuid = request.query_params.get("uuid", "")
         path = tempfile.gettempdir() + os.sep + 'testy_spreadsheet_reports'
         if not os.path.exists(path):
-            os.mkdir(path)
+            pathlib.Path(path).mkdir(parents=True, exist_ok=True)
         if file_name:
             if os.path.exists(
                     tempfile.gettempdir() + os.sep + Service.__dir_reports + os.sep + request.query_params[
@@ -46,7 +47,7 @@ class Service:
                         "rb"),
                     status=status.HTTP_200_OK)
             else:
-                return Response("File is not exist", status=status.HTTP_404_NOT_FOUND)
+                return Response("File does not exist", status=status.HTTP_404_NOT_FOUND)
         elif uuid:
             file_paths = glob.glob(
                 tempfile.gettempdir() + os.sep + Service.__dir_reports + os.sep + f"{uuid}_*_testy_logs.json")
