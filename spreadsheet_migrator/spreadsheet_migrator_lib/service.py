@@ -86,8 +86,10 @@ class Service:
                 report_info = Service.fill_report(obj_logs, config)
                 if report_info:
                     report[key] = report_info
+        dir = pathlib.Path(tempfile.gettempdir() + os.sep + Service.__dir_reports)
+        dir.mkdir(parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(prefix=uuid + "_", suffix="_testy_logs.json", delete=False, mode="w",
-                                         dir=tempfile.gettempdir() + os.sep + Service.__dir_reports) as file:
+                                         dir=dir) as file:
             json.dump(report, file, cls=DjangoJSONEncoder)
         return os.path.basename(file.name)
 
