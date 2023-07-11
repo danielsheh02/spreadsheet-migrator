@@ -3,6 +3,9 @@ from typing import Dict, List, Tuple, Set
 from django.core.exceptions import MultipleObjectsReturned
 from django.db.models import Q
 from django.forms.models import model_to_dict
+
+from core.models import Project
+from core.services.labels import LabelService
 from tests_description.models import TestCase, TestSuite, TestCaseStep
 from tests_description.services.cases import TestCaseService
 from tests_representation.api.v1.serializers import TestPlanInputSerializer, TestPlanOutputSerializer
@@ -77,26 +80,24 @@ class TestyCreator:
                         set(), set_of_ids_params)},
                     project)
 
-    def get_or_create_suite(self, suite_dict):
+    def get_or_create_suite(self, suite_dict, project: Project):
         created = False
         try:
-            found_suite, created = TestSuite.objects.get_or_create(**suite_dict)
+            found_suite, created = TestSuite.objects.get_or_create(**suite_dict, project=project)
         except MultipleObjectsReturned:
-            found_suite = TestSuite.objects.filter(**suite_dict)[0]
+            found_suite = TestSuite.objects.filter(**suite_dict, project=project)[0]
         self.put_to_log(self.suites_logs, found_suite, created)
         return found_suite
 
-    def get_or_create_case(self, case_dict):
-        steps = case_dict.pop('steps', [])
-        q_lookup = Q()
-        for step in steps:
-            q_lookup |= Q(**step)
-        found_steps = TestCaseStep.objects.filter(q_lookup)
+    def get_or_create_case(self, case_dict, project: Project):
+        steps = case_dict.pop('steps')
+        labels = case_dict.pop('labels')
+        found_steps = self.find_steps(steps)
         created = False
         try:
-            found_case, created = TestCase.objects.get_or_create(**case_dict, steps__in=found_steps)
+            found_case, created = TestCase.objects.get_or_create(**case_dict, steps__in=found_steps, project=project)
         except MultipleObjectsReturned:
-            found_case = TestCase.objects.filter(**case_dict, steps__in=found_steps)[0]
+            found_case = TestCase.objects.filter(**case_dict, steps__in=found_steps, project=project)[0]
         self.put_to_log(self.cases_logs, found_case, created)
         if not created:
             return found_case
@@ -106,7 +107,20 @@ class TestyCreator:
             step['test_case_history_id'] = found_case.history.first().history_id
             step['sort_order'] = idx
             TestCaseService().step_create(step)
+        if labels:
+            label_kwargs = {'user': self.request.user}
+            labeled_item_kwargs = {'content_object_history_id': found_case.history.first().history_id}
+            LabelService().add(labels, found_case, label_kwargs, labeled_item_kwargs)
         return found_case
+
+    @staticmethod
+    def find_steps(steps):
+        q_lookup = Q()
+        for step in steps:
+            q_lookup |= Q(**step)
+        if not q_lookup:
+            return list()
+        return TestCaseStep.objects.filter(q_lookup)
 
     @staticmethod
     def put_to_log(log, model_instance=None, created: bool = False, lack_data=None):
